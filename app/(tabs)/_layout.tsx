@@ -1,43 +1,50 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+// File: app/(tabs)/_layout.tsx
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import React from 'react';
+import { Tabs } from 'expo-router';
+import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+
+// The primary red color for active elements
+const PRIMARY_COLOR = '#D90429';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
+        headerShown: false, // We will create a custom header in each screen
+        tabBarActiveTintColor: PRIMARY_COLOR,
+        tabBarInactiveTintColor: 'gray',
+        tabBarStyle: {
+          height: 90, // A bit taller for a modern look
+          paddingBottom: 30,
+        },
+      }}
+    >
       <Tabs.Screen
-        name="index"
+        name="index" // This links to app/(tabs)/index.jsx
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="history" // You will need to create app/(tabs)/history.jsx
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'History',
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome5 name="history" size={size} color={color} />
+          ),
+        }}
+      />
+       <Tabs.Screen
+        name="profile" // You will need to create app/(tabs)/profile.jsx
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person-circle" size={size} color={color} />
+          ),
         }}
       />
     </Tabs>
