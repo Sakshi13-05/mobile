@@ -1,24 +1,88 @@
-// File: app/(tabs)/index.jsx
+// File: mobile/app/(tabs)/index.jsx
 
-import React from 'react';
-import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { Ionicons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
+import { Alert } from 'react-native'; 
 
 const PRIMARY_COLOR = '#D90429';
+
+const API_URL = "http://192:168.1.3:3000"; 
 
 export default function HomeScreen() {
   const router = useRouter();
   
-  // Dummy user name for display
-  const userName = "Emma";
+  const [user, setUser] = useState(null); // State to hold the user data
+  const [isLoading, setIsLoading] = useState(true);
+
+  // 2. This effect runs when the screen loads to get the user's data from storage
+  useEffect(() => {
+    const loadUserData = async () => {
+      const userDataString = await SecureStore.getItemAsync('userData');
+      if (userDataString) {
+        setUser(JSON.parse(userDataString)); // Parse the string back into an object
+      }
+      setIsLoading(false);
+    };
+
+    loadUserData();
+  }, []);
+
+  const handleBookNow = async () => {
+    const token = await SecureStore.getItemAsync('userToken'); // Get the saved JWT
+    if (!token) {
+        Alert.alert("Error", "You are not logged in.");
+        return;
+    }
+
+    // This is sample data. In a real app, this would come from a map or form.
+    const bookingDetails = {
+        pickup: '123 Main St, Anytown, USA',
+        dropoff: 'General Hospital, 456 Health Ave',
+        price: 350,
+    };
+
+    try {
+        const response = await fetch(`${API_URL}/book-ambulance`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // Attach the JWT!
+            },
+            body: JSON.stringify(bookingDetails),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.error);
+        }
+
+        Alert.alert("Success", "Ambulance booked! Check your history.");
+    } catch (err) {
+        Alert.alert("Booking Failed", err.message);
+    }
+  };
+
+  // Show a loading spinner while we wait for storage
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.centeredContainer}>
+        <ActivityIndicator size="large" color={PRIMARY_COLOR} />
+      </SafeAreaView>
+    );
+  }
+
+
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Custom Header */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.greetingText}>Good Morning, {userName}</Text>
+          {/* 3. Display the user's name from our state */}
+          <Text style={styles.greetingText}>Good Morning, <Text style={{fontWeight: 'bold'}}>{user?.name || 'User'}</Text></Text>
           <Text style={styles.headerSubText}>How can we help you?</Text>
         </View>
         <View style={styles.headerIcons}>
@@ -27,10 +91,13 @@ export default function HomeScreen() {
           </TouchableOpacity>
           <TouchableOpacity onPress={() => router.push('/profile')}>
             <Image 
-              source={{ uri: 'https://i.pravatar.cc/150?u=a042581f4e29026704d' }} // Placeholder user image
+              source={{ uri: 'https://i.pravatar.cc/150' }} // Placeholder for now
               style={styles.profileImage} 
             />
           </TouchableOpacity>
+          <TouchableOpacity style={styles.bookButton} onPress={handleBookNow}>
+          <Text style={styles.bookButtonText}>Create Sample Booking</Text>
+      </TouchableOpacity>
         </View>
       </View>
 
@@ -161,4 +228,17 @@ const styles = StyleSheet.create({
     color: 'gray',
     marginTop: 2,
   },
+
+  bookButton: {
+        backgroundColor: 'green',
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+        margin: 20,
+    },
+    bookButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 16,
+    }
 });
