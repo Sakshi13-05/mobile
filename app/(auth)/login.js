@@ -5,10 +5,11 @@ import { StyleSheet, Text, View, SafeAreaView, TextInput, TouchableOpacity, Scro
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PRIMARY_COLOR = '#D90429';
 
-const API_URL = "http://192.168.1.3:3000";
+const API_URL = "http://192:168.1.3:3000";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -43,8 +44,8 @@ export default function LoginScreen() {
       }
 
 
-      await SecureStore.setItemAsync('userToken', data.token);
-      await SecureStore.setItemAsync('userData', JSON.stringify(data.user));
+      await AsyncStorage.setItem('userToken', data.token);
+      await AsyncStorage.setItem('userData', JSON.stringify(data.user));
 
      
       router.replace('/(tabs)');

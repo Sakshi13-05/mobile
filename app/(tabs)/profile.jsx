@@ -5,6 +5,7 @@ import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Alert } from 'r
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PRIMARY_COLOR = '#D90429';
 
@@ -15,7 +16,7 @@ export default function ProfileScreen() {
   // Load the user's data from storage when the screen opens
   useEffect(() => {
     const loadUserData = async () => {
-      const userDataString = await SecureStore.getItemAsync('userData');
+      const userDataString = await AsyncStorage.getItem('userData');
       if (userDataString) {
         setUser(JSON.parse(userDataString));
       }
@@ -25,8 +26,8 @@ export default function ProfileScreen() {
 
   const handleLogout = async () => {
     // For JWT, logging out means deleting the token and user data from storage
-    await SecureStore.deleteItemAsync('userToken');
-    await SecureStore.deleteItemAsync('userData');
+    await AsyncStorage.removeItem('userToken');
+    await AsyncStorage.removeItem('userData');
     
     // Navigate back to the auth flow and prevent going back
     router.replace('/(auth)'); 

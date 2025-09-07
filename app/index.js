@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar } from 'react-native';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PRIMARY_COLOR = '#D90429';
 

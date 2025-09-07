@@ -6,6 +6,7 @@ import { Ionicons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-ico
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { Alert } from 'react-native'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PRIMARY_COLOR = '#D90429';
 
@@ -20,7 +21,7 @@ export default function HomeScreen() {
   // 2. This effect runs when the screen loads to get the user's data from storage
   useEffect(() => {
     const loadUserData = async () => {
-      const userDataString = await SecureStore.getItemAsync('userData');
+      const userDataString = await AsyncStorage.getItem('userData');
       if (userDataString) {
         setUser(JSON.parse(userDataString)); // Parse the string back into an object
       }
@@ -31,7 +32,7 @@ export default function HomeScreen() {
   }, []);
 
   const handleBookNow = async () => {
-    const token = await SecureStore.getItemAsync('userToken'); // Get the saved JWT
+    const token = await AsyncStorage.getItem('userToken'); // Get the saved JWT
     if (!token) {
         Alert.alert("Error", "You are not logged in.");
         return;
@@ -82,18 +83,13 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <View>
           {/* 3. Display the user's name from our state */}
-          <Text style={styles.greetingText}>Good Morning, <Text style={{fontWeight: 'bold'}}>{user?.name || 'User'}</Text></Text>
+          <Text style={styles.greetingText}><Text style={{fontWeight: 'bold'}}>{user?.name || 'User'}</Text></Text>
           <Text style={styles.headerSubText}>How can we help you?</Text>
         </View>
         <View style={styles.headerIcons}>
-          <TouchableOpacity>
-            <Ionicons name="notifications-outline" size={28} color="#1c1c1e" />
-          </TouchableOpacity>
+          
           <TouchableOpacity onPress={() => router.push('/profile')}>
-            <Image 
-              source={{ uri: 'https://i.pravatar.cc/150' }} // Placeholder for now
-              style={styles.profileImage} 
-            />
+            
           </TouchableOpacity>
           <TouchableOpacity style={styles.bookButton} onPress={handleBookNow}>
           <Text style={styles.bookButtonText}>Create Sample Booking</Text>

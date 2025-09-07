@@ -3,6 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, FlatList, Image, Dimensions, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 const PRIMARY_COLOR = '#D90429';
